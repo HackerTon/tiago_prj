@@ -10,5 +10,5 @@
     <arg name="name" default="model" />
 
     <node pkg="gazebo_ros" type="spawn_model" name="$(arg name)" args="-file 
-    $(find tiago_prj)/models/aruco/aruco_$(arg markerId).sdf -sdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -model $(arg name)" />
+    $(find tiago_prj)/models/aruco_$(arg markerId)/aruco_$(arg markerId).sdf -sdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -model $(arg name)" />
 </launch>
