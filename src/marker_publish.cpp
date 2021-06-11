@@ -143,7 +143,6 @@ class ArucoMarkerPublisher {
     image_transport::Publisher image_pub_;
     image_transport::Publisher debug_pub_;
     ros::Publisher marker_pub_;
-    ros::Publisher marker_list_pub_;
     tf::TransformListener tfListener_;
 
     ros::Subscriber cam_info_sub_;
@@ -187,7 +186,6 @@ class ArucoMarkerPublisher {
         image_pub_ = it_.advertise("result", 1);
         debug_pub_ = it_.advertise("debug", 1);
         marker_pub_ = nh_.advertise<aruco_msgs::MarkerArray>("markers", 100);
-        marker_list_pub_ = nh_.advertise<std_msgs::UInt32MultiArray>("markers_list", 10);
 
         marker_msg_ = aruco_msgs::MarkerArray::Ptr(new aruco_msgs::MarkerArray());
         marker_msg_->header.frame_id = reference_frame_;
@@ -222,11 +220,10 @@ class ArucoMarkerPublisher {
 
     void image_callback(const sensor_msgs::ImageConstPtr &msg) {
         bool publishMarkers = marker_pub_.getNumSubscribers() > 0;
-        bool publishMarkersList = marker_list_pub_.getNumSubscribers() > 0;
         bool publishImage = image_pub_.getNumSubscribers() > 0;
         bool publishDebug = debug_pub_.getNumSubscribers() > 0;
 
-        if (!publishMarkers && !publishMarkersList && !publishImage && !publishDebug)
+        if (!publishMarkers && !publishImage && !publishDebug)
             return;
 
         ros::Time curr_stamp = msg->header.stamp;
@@ -277,7 +274,8 @@ class ArucoMarkerPublisher {
                         transform = static_cast<tf::Transform>(cameraToReference) * static_cast<tf::Transform>(lefttoright) * transform;
 
                         // create a stamped version with something
-                        tf::StampedTransform stampedTransform(transform, curr_stamp, reference_frame_, i + "_point");
+                        tf::StampedTransform stampedTransform(transform, curr_stamp, reference_frame_, "point_" + std::to_string(marker_i.id));
+                        ROS_INFO("PRINTING POINT");
 
                         // sendtransform
                         static tf::TransformBroadcaster br;
@@ -290,14 +288,6 @@ class ArucoMarkerPublisher {
                 //publish marker array
                 if (marker_msg_->markers.size() > 0)
                     marker_pub_.publish(marker_msg_);
-            }
-
-            if (publishMarkersList) {
-                marker_list_msg_.data.resize(markers_.size());
-                for (size_t i = 0; i < markers_.size(); ++i)
-                    marker_list_msg_.data[i] = markers_[i].id;
-
-                marker_list_pub_.publish(marker_list_msg_);
             }
 
             // Draw detected markers on the image for visualization
