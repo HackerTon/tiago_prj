@@ -3,6 +3,7 @@
   <arg name="namespace" default="/" />
   <arg name="public_sim" default="true" />
   <arg name="gazebo" default="true" />
+  <arg name="ismap" default="true" />
 
   <arg name="robot" default="titanium" />
   <arg name="arm" default="$(eval {'iron': False}.get(arg('robot'), True))" />
@@ -32,8 +33,6 @@
   <arg name="sim_sufix" value="_public_sim" if="$(arg public_sim)" />
   <arg name="sim_sufix" value="" unless="$(arg public_sim)" />
 
-  <env name="PAL_HOST" value="tiago" />
-
   <group ns="$(arg namespace)">
     <!-- create gazebo world -->
     <include file="$(find tiago_prj)/launch/tiago_world.launch" if="$(arg gazebo)">
@@ -57,7 +56,7 @@
       <arg name="public_sim" value="$(arg public_sim)" />
     </include>
 
-    <include file="$(find tiago_2dnav_gazebo)/launch/navigation.launch">
+    <include file="$(find tiago_2dnav_gazebo)/launch/navigation.launch" if="$(arg ismap)">
       <arg name="state" value="mapping" />
       <arg name="mapping" value="$(arg mapping)" />
       <arg name="planner" value="$(arg planner)" />

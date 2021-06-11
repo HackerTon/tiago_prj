@@ -4,16 +4,22 @@ project(tiago_prj)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
+find_package(OpenCV REQUIRED)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
+  dynamic_reconfigure
+  geometry_msgs
   image_transport
-  message_generation
+  roscpp
   rospy
+  tf
+  aruco
+  aruco_msgs
   sensor_msgs
-  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -106,9 +112,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES tiago_prj
- CATKIN_DEPENDS cv_bridge image_transport rospy sensor_msgs std_msgs message_runtime geometry_msgs
+ INCLUDE_DIRS include
+ LIBRARIES tiago_prj
+ CATKIN_DEPENDS cv_bridge image_transport rospy sensor_msgs std_msgs geometry_msgs aruco tf
 #  DEPENDS system_lib
 )
 
@@ -119,8 +125,10 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
+  SYSTEM
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -153,6 +161,9 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
+add_executable(marker_pub src/marker_publish.cpp)
+target_link_libraries(marker_pub ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
 #############
 ## Install ##
 #############
@@ -165,6 +176,10 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/object_detector.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS marker_pub
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ## Mark executables for installation
