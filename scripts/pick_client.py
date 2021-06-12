@@ -149,7 +149,7 @@ class PickAruco(object):
                 rospy.sleep(0.01)
                 ps.header.stamp = self.tfBuffer.get_latest_common_time(
                     "base_footprint", aruco_pose.header.frame_id)
-		pick_g = PickUpPoseGoal()
+        pick_g = PickUpPoseGoal()
 
         if string_operation == "pick":
 

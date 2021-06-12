@@ -186,7 +186,7 @@ class ArucoMarkerPublisher {
 
         image_pub_ = it_.advertise("result", 1);
         debug_pub_ = it_.advertise("debug", 1);
-        marker_pub_ = nh_.advertise<aruco_msgs::MarkerArray>("aruco_markers", 100);
+        marker_pub_ = nh_.advertise<aruco_msgs::MarkerArray>("aruco_markers", 1);
 
         marker_msg_ = aruco_msgs::MarkerArray::Ptr(new aruco_msgs::MarkerArray());
         marker_msg_->header.frame_id = reference_frame_;
@@ -224,8 +224,8 @@ class ArucoMarkerPublisher {
         bool publishImage = image_pub_.getNumSubscribers() > 0;
         bool publishDebug = debug_pub_.getNumSubscribers() > 0;
 
-        if (!publishMarkers && !publishImage && !publishDebug)
-            return;
+        // if (!publishMarkers && !publishImage && !publishDebug)
+        //     return;
 
         ros::Time curr_stamp = msg->header.stamp;
         cv_bridge::CvImagePtr cv_ptr;
@@ -240,7 +240,7 @@ class ArucoMarkerPublisher {
             mDetector_.detect(inImage_, markers_, camParam_, marker_size_, false);
 
             // marker array publish
-            if (publishMarkers) {
+            if (true) {
                 marker_msg_->markers.clear();
                 marker_msg_->markers.resize(markers_.size());
                 marker_msg_->header.stamp = curr_stamp;
