@@ -41,6 +41,7 @@ or implied, of Rafael Muñoz Salinas.
 #include <ros/ros.h>
 #include <sensor_msgs/image_encodings.h>
 #include <std_msgs/UInt32MultiArray.h>
+#include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 
@@ -185,7 +186,7 @@ class ArucoMarkerPublisher {
 
         image_pub_ = it_.advertise("result", 1);
         debug_pub_ = it_.advertise("debug", 1);
-        marker_pub_ = nh_.advertise<aruco_msgs::MarkerArray>("markers", 100);
+        marker_pub_ = nh_.advertise<aruco_msgs::MarkerArray>("aruco_markers", 100);
 
         marker_msg_ = aruco_msgs::MarkerArray::Ptr(new aruco_msgs::MarkerArray());
         marker_msg_->header.frame_id = reference_frame_;

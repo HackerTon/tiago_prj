@@ -16,10 +16,17 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   roscpp
   rospy
+  tf2_ros
   tf
   aruco
   aruco_msgs
   sensor_msgs
+  actionlib
+  actionlib_msgs
+  aruco_ros
+  moveit_msgs
+  std_msgs
+  std_srvs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -69,16 +76,16 @@ add_message_files(
 # )
 
 ## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+add_action_files(
+  FILES
+  PickUpPose.action
+)
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
   std_msgs
+  actionlib_msgs
   geometry_msgs
 )
 
@@ -97,10 +104,9 @@ generate_messages(
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+generate_dynamic_reconfigure_options(
+  cfg/SphericalGrasp.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -114,7 +120,7 @@ generate_messages(
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES tiago_prj
- CATKIN_DEPENDS cv_bridge image_transport rospy sensor_msgs std_msgs geometry_msgs aruco tf
+ CATKIN_DEPENDS cv_bridge image_transport rospy sensor_msgs std_msgs geometry_msgs aruco tf2_ros tf
 #  DEPENDS system_lib
 )
 
@@ -197,18 +203,17 @@ install(TARGETS marker_pub
 # )
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(
+  DIRECTORY config launch
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  # myfile1
+  # myfile2
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##
