@@ -44,6 +44,8 @@
   <depend>image_transport</depend>
   <depend>rospy</depend>
   <depend>aruco</depend>
+  <depend>aruco_msgs</depend>
+  <depend>aruco_ros</depend>
   <depend>dynamic_reconfigure</depend>
   <depend>geometry_msgs</depend>
   <depend>std_msgs</depend>

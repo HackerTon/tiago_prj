@@ -38,7 +38,7 @@
     <node name="update_maps_link" pkg="pal_navigation_sm" type="base_maps_symlink.sh" args="tiago_maps" />
 
     <group ns="$(arg namespace)">
-
+        <!-- spawn world -->
         <include file="$(find tiago_prj)/launch/tiago_world.launch">
             <arg name="world_name" default="$(arg world_name)" />
             <arg name="gui" default="$(arg gui)" />
@@ -61,6 +61,7 @@
             <arg if="$(eval local_planner == 'teb')" name="use_dynamic_footprint" value="true" />
         </include>
 
+        <!-- launch navigation stack -->
         <include file="$(find tiago_2dnav_gazebo)/launch/navigation.launch">
             <arg name="state" value="localization" />
             <arg name="planner" value="$(arg planner)" />

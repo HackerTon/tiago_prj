@@ -85,6 +85,7 @@ add_action_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  aruco_msgs
   actionlib_msgs
   geometry_msgs
 )
@@ -120,7 +121,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES tiago_prj
- CATKIN_DEPENDS cv_bridge image_transport rospy sensor_msgs std_msgs geometry_msgs aruco tf2_ros tf
+ CATKIN_DEPENDS cv_bridge image_transport rospy sensor_msgs std_msgs geometry_msgs aruco tf2_ros tf aruco_msgs aruco_ros
 #  DEPENDS system_lib
 )
 
@@ -145,7 +146,7 @@ include_directories(
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -169,6 +170,7 @@ include_directories(
 
 add_executable(marker_pub src/marker_publish.cpp)
 target_link_libraries(marker_pub ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+add_dependencies(marker_pub ${catkin_EXPORTED_TARGETS})
 
 #############
 ## Install ##

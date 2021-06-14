@@ -21,8 +21,14 @@ for name in MoveItErrorCodes.__dict__.keys():
         moveit_error_dict[code] = name
 
 
-poses = [Pose(Point(-2.72496604919, -0.78588116169, 0.0),
-              Quaternion(0.0, 0.0, 0.828647508407, 0.559770762733))]
+poses = [
+    Pose(Point(7.33190965652, 4.13128566742, 0.0), Quaternion(
+        0.0, 0.0, 0.999659681939, 0.026086784101)),
+    Pose(Point(7.79271697998, -5.17713737488, 0.0),
+         Quaternion(0.0, 0.0, -0.0565811701486, 0.998398002394)),
+    Pose(Point(-0.135614752769, 0.923734128475, 0.0),
+         Quaternion(0.0, 0.0, 0.699049673936, 0.715073110507)),
+]
 
 
 class Driver():
@@ -76,6 +82,9 @@ class Driver():
 
         rospy.loginfo('Successfully started commander!')
 
+        # for pose in poses:
+        #     self.move(pose)
+
     def move(self, pose):
         movebasegoal = self.create_movebasegoal(pose)
         self.move_base_action.send_goal_and_wait(movebasegoal)
@@ -95,18 +104,17 @@ class Driver():
         return s[1:] if s.startswith('/') else s
 
     def pick(self, operation):
-        # self.unfold_arm()
-        # self.lower_head()
+        self.unfold_arm()
+        self.lower_head()
 
         rospy.sleep(2)
         rospy.loginfo('waiting marker')
-        aruco_markers = rospy.wait_for_message(
-            '/aruco_many/aruco_markers', MarkerArray, rospy.Duration(10.0))
-        rospy.loginfo('waited marker')
 
-        # get only one aruco from markersarray
-        if len(aruco_markers.markers) == 0:
-            rospy.loginfo('No marker to graph')
+        try:
+            aruco_markers = rospy.wait_for_message(
+                '/aruco_many/aruco_markers', MarkerArray, rospy.Duration(10.0))
+        except rospy.ROSException as e:
+            rospy.logerr('wait for aruco error' + e.message)
             return
 
         aruco_pose = aruco_markers.markers[0]
@@ -127,7 +135,7 @@ class Driver():
                     'base_footprint', ps.header.frame_id, rospy.Time(0))
                 aruco_ps = do_transform_pose(ps, transform)
                 transform_ok = True
-            except Exception as e:
+            except Exception as _:
                 rospy.logwarn('Transform error try again')
                 rospy.sleep(0.01)
                 ps.header.stamp = self.tfbuffer.get_latest_common_time(
@@ -136,7 +144,6 @@ class Driver():
         rospy.loginfo('transform successful')
 
         pick_g = PickUpPoseGoal()
-
         if operation == 'pick':
             rospy.loginfo('open')
             pick_g.object_pose.pose.position = aruco_ps.pose.position

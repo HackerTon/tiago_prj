@@ -188,10 +188,10 @@
       <pose frame=''>1.29214 -4.47886 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>2730 782000000</sim_time>
-      <real_time>80 671404658</real_time>
-      <wall_time>1623516212 259571383</wall_time>
-      <iterations>47945</iterations>
+      <sim_time>2861 33000000</sim_time>
+      <real_time>227 368582164</real_time>
+      <wall_time>1623604206 228359941</wall_time>
+      <iterations>130251</iterations>
       <model name='ambulance'>
         <pose frame=''>-15.5019 -5.14715 0 0 -0 0</pose>
         <scale>1 1 1</scale>
@@ -343,20 +343,20 @@
         </link>
       </model>
       <model name='bifrutas_tropical_can_clone'>
-        <pose frame=''>1.71191 -4.32831 0.585998 0.000213 0.000243 6.9e-05</pose>
+        <pose frame=''>1.71192 -4.32831 0.586002 0.000294 0.000374 0.0001</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>1.71191 -4.32831 0.585998 0.000213 0.000243 6.9e-05</pose>
+          <pose frame=''>1.71192 -4.32831 0.586002 0.000294 0.000374 0.0001</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -9.8 0 -0 0</acceleration>
           <wrench>0 0 -2.45 0 -0 0</wrench>
         </link>
       </model>
       <model name='bifrutas_tropical_can_clone_clone'>
-        <pose frame=''>1.53508 -4.33619 0.585997 0.000127 -0.000198 6.4e-05</pose>
+        <pose frame=''>1.5351 -4.33618 0.585992 -1.4e-05 5.6e-05 0.000101</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>1.53508 -4.33619 0.585997 0.000127 -0.000198 6.4e-05</pose>
+          <pose frame=''>1.5351 -4.33618 0.585992 -1.4e-05 5.6e-05 0.000101</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -9.8 0 -0 0</acceleration>
           <wrench>0 0 -2.45 0 -0 0</wrench>
@@ -373,30 +373,30 @@
         </link>
       </model>
       <model name='bowl'>
-        <pose frame=''>-2.47266 -6.59661 -6e-06 3.7e-05 3.7e-05 -1.2e-05</pose>
+        <pose frame=''>-2.47266 -6.59661 -6e-06 3.7e-05 3.7e-05 -2.4e-05</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-2.47266 -6.59661 -6e-06 3.7e-05 3.7e-05 -1.2e-05</pose>
+          <pose frame=''>-2.47266 -6.59661 -6e-06 3.7e-05 3.7e-05 -2.4e-05</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -9.8 0 -0 0</acceleration>
           <wrench>0 0 -0.98 0 -0 0</wrench>
         </link>
       </model>
       <model name='bowl_clone'>
-        <pose frame=''>-1.96032 -6.56639 0.034994 -3.14155 -3.8e-05 -3.14156</pose>
+        <pose frame=''>-1.96032 -6.56639 0.034994 -3.14155 -3.9e-05 -3.14156</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-1.96032 -6.56639 0.034994 -3.14155 -3.8e-05 -3.14156</pose>
+          <pose frame=''>-1.96032 -6.56639 0.034994 -3.14155 -3.9e-05 -3.14156</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -9.8 0 -0 0</acceleration>
           <wrench>0 0 -0.98 0 -0 0</wrench>
         </link>
       </model>
       <model name='bowl_clone_0'>
-        <pose frame=''>-2.21856 -6.59134 -5e-06 4.8e-05 4.8e-05 -3.8e-05</pose>
+        <pose frame=''>-2.21856 -6.59134 -5e-06 4.8e-05 4.8e-05 -5.8e-05</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-2.21856 -6.59134 -5e-06 4.8e-05 4.8e-05 -3.8e-05</pose>
+          <pose frame=''>-2.21856 -6.59134 -5e-06 4.8e-05 4.8e-05 -5.8e-05</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -9.8 0 -0 0</acceleration>
           <wrench>0 0 -0.98 0 -0 0</wrench>
@@ -413,13 +413,13 @@
         </link>
       </model>
       <model name='citizen_extras_female_02'>
-        <pose frame=''>-0.633679 3.85494 0.000426 0.001618 -0.025079 -0.000146</pose>
+        <pose frame=''>-0.633679 3.85494 0.00042 0.001561 -0.02504 -0.000146</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-0.633679 3.85494 0.000426 0.001618 -0.025079 -0.000146</pose>
+          <pose frame=''>-0.633679 3.85494 0.00042 0.001561 -0.02504 -0.000146</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0.001152 -0.005369 -0.140111 0 -0 0</acceleration>
-          <wrench>0.023049 -0.10738 -2.80222 0 -0 0</wrench>
+          <acceleration>0 0 -9.8 0 -0 0</acceleration>
+          <wrench>0 0 -196 0 -0 0</wrench>
         </link>
       </model>
       <model name='citizen_extras_female_02_0'>
@@ -433,10 +433,10 @@
         </link>
       </model>
       <model name='citizen_extras_male_03'>
-        <pose frame=''>10.5151 -6.31417 0.010905 0.012567 0.002311 -1.49233</pose>
+        <pose frame=''>10.5151 -6.31417 0.010902 0.012559 0.002304 -1.49233</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>10.5151 -6.31417 0.010905 0.012567 0.002311 -1.49233</pose>
+          <pose frame=''>10.5151 -6.31417 0.010902 0.012559 0.002304 -1.49233</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -9.8 0 -0 0</acceleration>
           <wrench>0 0 -196 0 -0 0</wrench>
@@ -510,6 +510,46 @@
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='marker26_8cm'>
+        <pose frame=''>-2.84529 -0.939176 0.01 0 2e-06 0</pose>
+        <scale>1 1 1</scale>
+        <link name='marker'>
+          <pose frame=''>-2.84529 -0.939176 0.01 0 2e-06 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>-0.000441 -0.000441 -0.003967 0 -0 0</acceleration>
+          <wrench>-4.4e-05 -4.4e-05 -0.000397 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='marker26_8cm_0'>
+        <pose frame=''>-0.669893 2.39959 0.400011 -1.57191 0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='marker'>
+          <pose frame=''>-0.669893 2.39959 0.400011 -1.57191 0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>-0.159292 -0.003805 0.314788 0 -0 0</acceleration>
+          <wrench>-0.015929 -0.000381 0.031479 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='marker26_8cm_0_clone'>
+        <pose frame=''>4.45462 3.36593 0.400004 -1.57079 -1e-05 1.58727</pose>
+        <scale>1 1 1</scale>
+        <link name='marker'>
+          <pose frame=''>4.45462 3.36593 0.400004 -1.57079 -1e-05 1.58727</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>-0.0063 0.151853 -0.152028 0 -0 0</acceleration>
+          <wrench>-0.00063 0.015185 -0.015203 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='marker26_8cm_0_clone_0'>
+        <pose frame=''>9.01963 -6.31016 0.400001 -1.57081 1e-06 -1.5705</pose>
+        <scale>1 1 1</scale>
+        <link name='marker'>
+          <pose frame=''>9.01963 -6.31016 0.400001 -1.57081 1e-06 -1.5705</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>-0.004374 0.174817 1.30089 0 -0 0</acceleration>
+          <wrench>-0.000437 0.017482 0.130089 0 -0 0</wrench>
         </link>
       </model>
       <model name='pal_poster'>
@@ -723,13 +763,13 @@
         </link>
       </model>
       <model name='table'>
-        <pose frame=''>-12.5516 -2.77073 1 -1e-06 -3e-06 3e-06</pose>
+        <pose frame=''>-12.5516 -2.77073 1 0 2e-06 5e-06</pose>
         <scale>1 1 1</scale>
         <link name='wallWithREEMphoto_body'>
-          <pose frame=''>-12.5516 -2.77073 1 -1e-06 -3e-06 3e-06</pose>
+          <pose frame=''>-12.5516 -2.77073 1 0 2e-06 5e-06</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0.024592 0.489992 -8.57503 -0.489977 0.024112 0.000191</acceleration>
-          <wrench>0.098366 1.95997 -34.3001 0 -0 0</wrench>
+          <acceleration>-0.524042 -2.06768 16.3736 2.06775 -0.520965 0.004548</acceleration>
+          <wrench>-2.09617 -8.27073 65.4943 0 -0 0</wrench>
         </link>
       </model>
       <model name='table_0'>
@@ -763,13 +803,13 @@
         </link>
       </model>
       <model name='table_clone'>
-        <pose frame=''>0.027501 5.51046 1 -1e-06 3e-06 1.60787</pose>
+        <pose frame=''>0.027504 5.51045 1 1e-06 -3e-06 1.60787</pose>
         <scale>1 1 1</scale>
         <link name='wallWithREEMphoto_body'>
-          <pose frame=''>0.027501 5.51046 1 -1e-06 3e-06 1.60787</pose>
+          <pose frame=''>0.027504 5.51045 1 1e-06 -3e-06 1.60787</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>-0.488069 -0.042677 -8.57672 0.042205 -0.488074 -0.000189</acceleration>
-          <wrench>-1.95228 -0.170709 -34.3069 0 -0 0</wrench>
+          <acceleration>-5.54946 0.071466 4.05761 -0.071485 0.733683 -7e-06</acceleration>
+          <wrench>-22.1978 0.285863 16.2304 0 -0 0</wrench>
         </link>
       </model>
       <model name='table_marble'>
@@ -3343,7 +3383,7 @@
     </model>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>0.764698 -2.84029 14.1604 0 1.4938 1.74059</pose>
+        <pose frame=''>7.21399 -4.17232 1.44603 0 0.405796 -0.951429</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
@@ -5443,6 +5483,223 @@
         <enable_wind>0</enable_wind>
       </link>
       <pose frame=''>9.55605 -6.32184 0 0 -0 0</pose>
+    </model>
+    <model name='marker26_8cm'>
+      <static>0</static>
+      <link name='marker'>
+        <inertial>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>0</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.09 0.09 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://marker26_8cm/material/scripts</uri>
+              <uri>model://marker26_8cm/material/textures</uri>
+              <name>Aruco/marker26_8cm</name>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.09 0.09 0.02</size>
+            </box>
+          </geometry>
+          <surface>
+            <bounce/>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+        <enable_wind>0</enable_wind>
+      </link>
+      <pose frame=''>-2.84529 -0.939176 0 0 -0 0</pose>
+    </model>
+    <model name='marker26_8cm_0'>
+      <static>0</static>
+      <link name='marker'>
+        <inertial>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>0</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.8 0.8 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Aruco/marker26_8cm</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.8 0.8 0.02</size>
+            </box>
+          </geometry>
+          <surface>
+            <bounce/>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+        <enable_wind>0</enable_wind>
+      </link>
+      <pose frame=''>-0.691798 2.03358 0 0 -0 0</pose>
+    </model>
+    <model name='marker26_8cm_0_clone'>
+      <static>0</static>
+      <link name='marker'>
+        <inertial>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>0</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.8 0.8 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Aruco/marker26_8cm</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.8 0.8 0.02</size>
+            </box>
+          </geometry>
+          <surface>
+            <bounce/>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+        <enable_wind>0</enable_wind>
+      </link>
+      <pose frame=''>4.99327 3.16263 0.400076 -1.58009 -0 0</pose>
+    </model>
+    <model name='marker26_8cm_0_clone_0'>
+      <static>0</static>
+      <link name='marker'>
+        <inertial>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>0</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.8 0.8 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Aruco/marker26_8cm</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.8 0.8 0.02</size>
+            </box>
+          </geometry>
+          <surface>
+            <bounce/>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+        <enable_wind>0</enable_wind>
+      </link>
+      <pose frame=''>8.55804 -6.42364 0.400015 -1.57233 0 0</pose>
     </model>
   </world>
 </sdf>
