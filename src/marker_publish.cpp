@@ -277,9 +277,11 @@ class ArucoMarkerPublisher {
 
                     aruco::Marker &marker = markers_[i];
 
-                    for (size_t j = 0; j < markers_big.size(); ++j) {
-                        if (marker.id == markers_big[j].id) {
-                            marker = markers_big[j];
+                    if (marker.id == 26) {
+                        for (size_t j = 0; j < markers_big.size(); ++j) {
+                            if (marker.id == markers_big[j].id) {
+                                marker = markers_big[j];
+                            }
                         }
                     }
 
