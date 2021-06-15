@@ -39,9 +39,10 @@ import cv2
 from cv_bridge import CvBridge
 
 from moveit_msgs.msg import MoveItErrorCodes
+
 moveit_error_dict = {}
 for name in MoveItErrorCodes.__dict__.keys():
-    if not name[:1] == '_':
+    if not name[:1] == "_":
         code = MoveItErrorCodes.__dict__[name]
         moveit_error_dict[code] = name
 
@@ -51,10 +52,8 @@ class SphericalService(object):
         rospy.loginfo("Starting Spherical Grab Service")
         self.pick_type = PickAruco()
         rospy.loginfo("Finished SphericalService constructor")
-        self.place_gui = rospy.Service(
-            "/place_gui", Empty, self.start_aruco_place)
-        self.pick_gui = rospy.Service(
-            "/pick_gui", Empty, self.start_aruco_pick)
+        self.place_gui = rospy.Service("/place_gui", Empty, self.start_aruco_place)
+        self.pick_gui = rospy.Service("/pick_gui", Empty, self.start_aruco_pick)
 
     def start_aruco_pick(self, req):
         self.pick_type.pick_aruco("pick")
@@ -73,28 +72,29 @@ class PickAruco(object):
         self.queue = []
 
         rospy.loginfo("Waiting for /pickup_pose AS...")
-        self.pick_as = SimpleActionClient('/pickup_pose', PickUpPoseAction)
+        self.pick_as = SimpleActionClient("/pickup_pose", PickUpPoseAction)
         time.sleep(1.0)
         if not self.pick_as.wait_for_server(rospy.Duration(20)):
             rospy.logerr("Could not connect to /pickup_pose AS")
             exit()
 
         rospy.loginfo("Waiting for /place_pose AS...")
-        self.place_as = SimpleActionClient('/place_pose', PickUpPoseAction)
+        self.place_as = SimpleActionClient("/place_pose", PickUpPoseAction)
         self.place_as.wait_for_server()
 
         rospy.loginfo("Setting publishers to torso and head controller...")
         self.torso_cmd = rospy.Publisher(
-            '/torso_controller/command', JointTrajectory, queue_size=1)
+            "/torso_controller/command", JointTrajectory, queue_size=1
+        )
         self.head_cmd = rospy.Publisher(
-            '/head_controller/command', JointTrajectory, queue_size=1)
-        self.detected_pose_pub = rospy.Publisher('/detected_aruco_pose',
-                                                 PoseStamped,
-                                                 queue_size=1,
-                                                 latch=True)
+            "/head_controller/command", JointTrajectory, queue_size=1
+        )
+        self.detected_pose_pub = rospy.Publisher(
+            "/detected_aruco_pose", PoseStamped, queue_size=1, latch=True
+        )
 
         rospy.loginfo("Waiting for '/play_motion' AS...")
-        self.play_m_as = SimpleActionClient('/play_motion', PlayMotionAction)
+        self.play_m_as = SimpleActionClient("/play_motion", PlayMotionAction)
         if not self.play_m_as.wait_for_server(rospy.Duration(20)):
             rospy.logerr("Could not connect to /play_motion AS")
             exit()
@@ -122,44 +122,50 @@ class PickAruco(object):
         rospy.sleep(2.0)
         rospy.loginfo("spherical_grasp_gui: Waiting for an aruco detection")
 
-        aruco_pose = rospy.wait_for_message('/aruco_single/pose', PoseStamped)
+        aruco_pose = rospy.wait_for_message("/aruco_single/pose", PoseStamped)
         aruco_pose.header.frame_id = self.strip_leading_slash(
-            aruco_pose.header.frame_id)
+            aruco_pose.header.frame_id
+        )
         rospy.loginfo("Got: " + str(aruco_pose))
 
-        rospy.loginfo("spherical_grasp_gui: Transforming from frame: " +
-                      aruco_pose.header.frame_id + " to 'base_footprint'")
+        rospy.loginfo(
+            "spherical_grasp_gui: Transforming from frame: "
+            + aruco_pose.header.frame_id
+            + " to 'base_footprint'"
+        )
         ps = PoseStamped()
         ps.pose.position = aruco_pose.pose.position
         ps.header.stamp = self.tfBuffer.get_latest_common_time(
-            "base_footprint", aruco_pose.header.frame_id)
+            "base_footprint", aruco_pose.header.frame_id
+        )
         ps.header.frame_id = aruco_pose.header.frame_id
         transform_ok = False
         while not transform_ok and not rospy.is_shutdown():
             try:
-                transform = self.tfBuffer.lookup_transform("base_footprint",
-                                                           ps.header.frame_id,
-                                                           rospy.Time(0))
+                transform = self.tfBuffer.lookup_transform(
+                    "base_footprint", ps.header.frame_id, rospy.Time(0)
+                )
                 aruco_ps = do_transform_pose(ps, transform)
                 transform_ok = True
             except tf2_ros.ExtrapolationException as e:
                 rospy.logwarn(
-                    "Exception on transforming point... trying again \n(" +
-                    str(e) + ")")
+                    "Exception on transforming point... trying again \n(" + str(e) + ")"
+                )
                 rospy.sleep(0.01)
                 ps.header.stamp = self.tfBuffer.get_latest_common_time(
-                    "base_footprint", aruco_pose.header.frame_id)
+                    "base_footprint", aruco_pose.header.frame_id
+                )
         pick_g = PickUpPoseGoal()
 
         if string_operation == "pick":
 
             rospy.loginfo("Setting cube pose based on ArUco detection")
             pick_g.object_pose.pose.position = aruco_ps.pose.position
-            pick_g.object_pose.pose.position.z -= 0.1*(1.0/2.0)
+            pick_g.object_pose.pose.position.z -= 0.1 * (1.0 / 2.0)
 
             rospy.loginfo("aruco pose in base_footprint:" + str(pick_g))
 
-            pick_g.object_pose.header.frame_id = 'base_footprint'
+            pick_g.object_pose.header.frame_id = "base_footprint"
             pick_g.object_pose.pose.orientation.w = 1.0
             self.detected_pose_pub.publish(pick_g.object_pose)
             rospy.loginfo("Gonna pick:" + str(pick_g))
@@ -177,7 +183,7 @@ class PickAruco(object):
             # Raise arm
             rospy.loginfo("Moving arm to a safe pose")
             pmg = PlayMotionGoal()
-            pmg.motion_name = 'pick_final_pose'
+            pmg.motion_name = "pick_final_pose"
             pmg.skip_planning = False
             self.play_m_as.send_goal_and_wait(pmg)
             rospy.loginfo("Raise object done.")
@@ -191,7 +197,7 @@ class PickAruco(object):
     def lift_torso(self):
         rospy.loginfo("Moving torso up")
         jt = JointTrajectory()
-        jt.joint_names = ['torso_lift_joint']
+        jt.joint_names = ["torso_lift_joint"]
         jtp = JointTrajectoryPoint()
         jtp.positions = [0.34]
         jtp.time_from_start = rospy.Duration(2.5)
@@ -201,7 +207,7 @@ class PickAruco(object):
     def lower_head(self):
         rospy.loginfo("Moving head down")
         jt = JointTrajectory()
-        jt.joint_names = ['head_1_joint', 'head_2_joint']
+        jt.joint_names = ["head_1_joint", "head_2_joint"]
         jtp = JointTrajectoryPoint()
         jtp.positions = [0.0, -0.75]
         jtp.time_from_start = rospy.Duration(2.0)
@@ -212,7 +218,7 @@ class PickAruco(object):
     def prepare_robot(self):
         rospy.loginfo("Unfold arm safely")
         pmg = PlayMotionGoal()
-        pmg.motion_name = 'pregrasp'
+        pmg.motion_name = "pregrasp"
         pmg.skip_planning = False
         self.play_m_as.send_goal_and_wait(pmg)
         rospy.loginfo("Done.")
@@ -222,7 +228,7 @@ class PickAruco(object):
         rospy.loginfo("Robot prepared.")
 
 
-if __name__ == '__main__':
-    rospy.init_node('pick_aruco_demo')
+if __name__ == "__main__":
+    rospy.init_node("pick_aruco_demo")
     sphere = SphericalService()
     rospy.spin()

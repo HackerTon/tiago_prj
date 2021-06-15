@@ -23,8 +23,8 @@
         </geometry>
         <material>
           <script>
-            <!-- <uri>model://marker26_8cm/material/scripts</uri>
-            <uri>model://marker26_8cm/material/textures</uri> -->
+            <uri>model://marker26_8cm/material/scripts</uri>
+            <uri>model://marker26_8cm/material/textures</uri>
             <name>Aruco/marker26_8cm</name>
           </script>
         </material>

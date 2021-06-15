@@ -16,7 +16,7 @@
     <arg name="tuck_arm" default="true" />
 
     <arg name="lost" default="true" />
-    <arg name="gzpose" default="-x 0.0  -y   0.0 -z  0.0   -R 0.0 -P 0.0 -Y  0.0" unless="$(arg lost)" />
+    <arg name="gzpose" default="-x 0.0  -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0" unless="$(arg lost)" />
     <arg name="gzpose" default="-x -0.587692 -y -1.00 -z 0.0 -R 0.0 -P 0.0 -Y 0.0" if="$(arg lost)" />
 
     <arg name="planner" default="base" />
@@ -77,11 +77,6 @@
         <node name="rviz" pkg="rviz" type="rviz" if="$(arg rviz)" args="-d $(find tiago_2dnav)/config/rviz/navigation$(arg sim_sufix).rviz" />
     </group>
 
-    <group unless="$(arg public_sim)">
-        <include file="$(find pal_loc_measure)/launch/pal_loc_measure.launch">
-            <arg name="training" value="False" />
-        </include>
-    </group>
 
     <!-- pointcloud to laserscan-->
     <group if="$(arg public_sim)">

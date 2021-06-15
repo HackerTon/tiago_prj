@@ -22,27 +22,28 @@
 #   * Jordi Pages
 
 
-import rospy
-import numpy as np
-import math
-from math import radians, pi
 import copy
+import math
 from copy import deepcopy
+from math import pi, radians
 
 import actionlib
-from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from std_msgs.msg import ColorRGBA, Header
-from geometry_msgs.msg import Pose, PoseStamped, PoseArray, Vector3Stamped, Vector3, Quaternion, Point
-from trajectory_msgs.msg import JointTrajectoryPoint, JointTrajectory
-from moveit_msgs.msg import Grasp, GripperTranslation
-from moveit_msgs.msg import PlaceAction, PlaceGoal, PlaceResult, PlaceLocation
-from visualization_msgs.msg import MarkerArray, Marker
-
-from tf import transformations
-from tf.transformations import quaternion_from_euler, euler_from_quaternion, quaternion_about_axis, unit_vector, quaternion_multiply
-
+import numpy as np
+import rospy
 from dynamic_reconfigure.server import Server
+from geometry_msgs.msg import (Point, Pose, PoseArray, PoseStamped, Quaternion,
+                               Vector3, Vector3Stamped)
+from moveit_msgs.msg import (Grasp, GripperTranslation, PlaceAction, PlaceGoal,
+                             PlaceLocation, PlaceResult)
+from std_msgs.msg import ColorRGBA, Header
+from tf import transformations
+from tf.transformations import (euler_from_quaternion, quaternion_about_axis,
+                                quaternion_from_euler, quaternion_multiply,
+                                unit_vector)
 from tiago_pick_demo.cfg import SphericalGraspConfig
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from visualization_msgs.msg import Marker, MarkerArray
+
 
 def normalize(v):
     norm = np.linalg.norm(v)
@@ -50,7 +51,9 @@ def normalize(v):
         return v
     return v / norm
 
+
 # http://stackoverflow.com/questions/17044296/quaternion-rotation-without-euler-angles
+
 
 def quaternion_from_vectors(v0, v1):
     if type(v0) == Point():
@@ -77,9 +80,8 @@ def quaternion_from_vectors(v0, v1):
     q[3] = s / 2.0
     return q
 
-def filter_poses(sphere_poses, object_pose,
-                 filter_behind=False,
-                 filter_under=True):
+
+def filter_poses(sphere_poses, object_pose, filter_behind=False, filter_under=True):
     """Given the generated poses and the object pose
     filter out the poses that are behind or under (if set to True)
     :type sphere_poses: []
@@ -103,8 +105,7 @@ def filter_poses(sphere_poses, object_pose,
 
 def sort_by_height(sphere_poses):
     # We prefer to grasp from top to be safer
-    newlist = sorted(
-        sphere_poses, key=lambda item: item.position.z, reverse=False)
+    newlist = sorted(sphere_poses, key=lambda item: item.position.z, reverse=False)
     sorted_list = newlist
     return sorted_list
 
@@ -118,12 +119,9 @@ class SphericalGrasps(object):
         self.dyn_rec_srv = Server(SphericalGraspConfig, self.dyn_rec_callback)
 
         # Setup Markers for debugging
-        self.poses_pub = rospy.Publisher(
-            '/sphere_poses', PoseArray, latch=True)
-        self.grasps_pub = rospy.Publisher(
-            '/grasp_poses', PoseArray, latch=True)
-        self.object_pub = rospy.Publisher(
-            '/object_marker', Marker, latch=True)
+        self.poses_pub = rospy.Publisher("/sphere_poses", PoseArray, latch=True)
+        self.grasps_pub = rospy.Publisher("/grasp_poses", PoseArray, latch=True)
+        self.object_pub = rospy.Publisher("/object_marker", Marker, latch=True)
 
         rospy.loginfo("SphericalGrasps initialized!")
 
@@ -132,8 +130,7 @@ class SphericalGrasps(object):
         rospy.loginfo("Received reconf call: " + str(config))
         self._grasp_postures_frame_id = config["grasp_postures_frame_id"]
         self._gripper_joint_names = config["gripper_joint_names"]
-        self._gripper_pre_grasp_positions = config[
-            "gripper_pre_grasp_positions"]
+        self._gripper_pre_grasp_positions = config["gripper_pre_grasp_positions"]
         self._gripper_grasp_positions = config["gripper_grasp_positions"]
         self._time_pre_grasp_posture = config["time_pre_grasp_posture"]
         self._time_grasp_posture = config["time_grasp_posture"]
@@ -156,11 +153,14 @@ class SphericalGrasps(object):
         self._allowed_touch_objects = config["allowed_touch_objects"]
 
         self._fix_tool_frame_to_grasping_frame_roll = config[
-            "fix_tool_frame_to_grasping_frame_roll"]
+            "fix_tool_frame_to_grasping_frame_roll"
+        ]
         self._fix_tool_frame_to_grasping_frame_pitch = config[
-            "fix_tool_frame_to_grasping_frame_pitch"]
+            "fix_tool_frame_to_grasping_frame_pitch"
+        ]
         self._fix_tool_frame_to_grasping_frame_yaw = config[
-            "fix_tool_frame_to_grasping_frame_yaw"]
+            "fix_tool_frame_to_grasping_frame_yaw"
+        ]
 
         self._step_degrees_yaw = config["step_degrees_yaw"]
         self._step_degrees_pitch = config["step_degrees_pitch"]
@@ -181,25 +181,50 @@ class SphericalGrasps(object):
         sphere_poses = []
         rotated_q = quaternion_from_euler(0.0, 0.0, math.radians(180))
 
-        yaw_qtty = int((self._max_degrees_yaw - self._min_degrees_yaw) / self._step_degrees_yaw)  # NOQA
-        pitch_qtty = int((self._max_degrees_pitch - self._min_degrees_pitch) / self._step_degrees_pitch)  # NOQA
-        info_str = "Creating poses with parameters:\n" + \
-            "Radius: " + str(radius) + "\n" \
-            "Yaw from: " + str(self._min_degrees_yaw) + \
-            " to " + str(self._max_degrees_yaw) + " with step " + \
-            str(self._step_degrees_yaw) + " degrees.\n" + \
-            "Pitch from: " + str(self._min_degrees_pitch) + \
-            " to " + str(self._max_degrees_pitch) + \
-            " with step " + str(self._step_degrees_pitch) + " degrees.\n" + \
-            "Total: " + str(yaw_qtty) + " yaw * " + str(pitch_qtty) + \
-            " pitch = " + str(yaw_qtty * pitch_qtty) + " grap poses."
+        yaw_qtty = int(
+            (self._max_degrees_yaw - self._min_degrees_yaw) / self._step_degrees_yaw
+        )  # NOQA
+        pitch_qtty = int(
+            (self._max_degrees_pitch - self._min_degrees_pitch)
+            / self._step_degrees_pitch
+        )  # NOQA
+        info_str = (
+            "Creating poses with parameters:\n" + "Radius: " + str(radius) + "\n"
+            "Yaw from: "
+            + str(self._min_degrees_yaw)
+            + " to "
+            + str(self._max_degrees_yaw)
+            + " with step "
+            + str(self._step_degrees_yaw)
+            + " degrees.\n"
+            + "Pitch from: "
+            + str(self._min_degrees_pitch)
+            + " to "
+            + str(self._max_degrees_pitch)
+            + " with step "
+            + str(self._step_degrees_pitch)
+            + " degrees.\n"
+            + "Total: "
+            + str(yaw_qtty)
+            + " yaw * "
+            + str(pitch_qtty)
+            + " pitch = "
+            + str(yaw_qtty * pitch_qtty)
+            + " grap poses."
+        )
         rospy.loginfo(info_str)
 
         # altitude is yaw
-        for altitude in range(self._min_degrees_yaw, self._max_degrees_yaw, self._step_degrees_yaw):  # NOQA
+        for altitude in range(
+            self._min_degrees_yaw, self._max_degrees_yaw, self._step_degrees_yaw
+        ):  # NOQA
             altitude = math.radians(altitude)
             # azimuth is pitch
-            for azimuth in range(self._min_degrees_pitch, self._max_degrees_pitch, self._step_degrees_pitch):  # NOQA
+            for azimuth in range(
+                self._min_degrees_pitch,
+                self._max_degrees_pitch,
+                self._step_degrees_pitch,
+            ):  # NOQA
                 azimuth = math.radians(azimuth)
                 # This gets all the positions
                 x = ori_x + radius * math.cos(azimuth) * math.cos(altitude)
@@ -226,8 +251,7 @@ class SphericalGrasps(object):
                 x += object_pose.pose.position.x
                 y += object_pose.pose.position.y
                 z += object_pose.pose.position.z
-                current_pose = Pose(
-                    Point(x, y, z), Quaternion(*q))
+                current_pose = Pose(Point(x, y, z), Quaternion(*q))
                 sphere_poses.append(current_pose)
         return sphere_poses
 
@@ -269,9 +293,7 @@ class SphericalGrasps(object):
         """
         grasps = []
         for idx, pose in enumerate(sphere_poses):
-            grasps.append(
-                self.create_grasp(pose,
-                                  "grasp_" + str(idx)))
+            grasps.append(self.create_grasp(pose, "grasp_" + str(idx)))
         return grasps
 
     def create_grasp(self, pose, grasp_id):
@@ -288,22 +310,28 @@ class SphericalGrasps(object):
         pre_grasp_posture = JointTrajectory()
         pre_grasp_posture.header.frame_id = self._grasp_postures_frame_id
         pre_grasp_posture.joint_names = [
-            name for name in self._gripper_joint_names.split()]
+            name for name in self._gripper_joint_names.split()
+        ]
         jtpoint = JointTrajectoryPoint()
         jtpoint.positions = [
-            float(pos) for pos in self._gripper_pre_grasp_positions.split()]
+            float(pos) for pos in self._gripper_pre_grasp_positions.split()
+        ]
         jtpoint.time_from_start = rospy.Duration(self._time_pre_grasp_posture)
         pre_grasp_posture.points.append(jtpoint)
 
         grasp_posture = copy.deepcopy(pre_grasp_posture)
         grasp_posture.points[0].time_from_start = rospy.Duration(
-            self._time_pre_grasp_posture + self._time_grasp_posture)
+            self._time_pre_grasp_posture + self._time_grasp_posture
+        )
         jtpoint2 = JointTrajectoryPoint()
         jtpoint2.positions = [
-            float(pos) for pos in self._gripper_grasp_positions.split()]
+            float(pos) for pos in self._gripper_grasp_positions.split()
+        ]
         jtpoint2.time_from_start = rospy.Duration(
-            self._time_pre_grasp_posture +
-            self._time_grasp_posture + self._time_grasp_posture_final)
+            self._time_pre_grasp_posture
+            + self._time_grasp_posture
+            + self._time_grasp_posture_final
+        )
         grasp_posture.points.append(jtpoint2)
 
         g.pre_grasp_posture = pre_grasp_posture
@@ -311,13 +339,17 @@ class SphericalGrasps(object):
 
         header = Header()
         header.frame_id = self._grasp_pose_frame_id  # base_footprint
-        q = [pose.orientation.x, pose.orientation.y,
-             pose.orientation.z, pose.orientation.w]
+        q = [
+            pose.orientation.x,
+            pose.orientation.y,
+            pose.orientation.z,
+            pose.orientation.w,
+        ]
         # Fix orientation from gripper_link to parent_link (tool_link)
         fix_tool_to_gripper_rotation_q = quaternion_from_euler(
             math.radians(self._fix_tool_frame_to_grasping_frame_roll),
             math.radians(self._fix_tool_frame_to_grasping_frame_pitch),
-            math.radians(self._fix_tool_frame_to_grasping_frame_yaw)
+            math.radians(self._fix_tool_frame_to_grasping_frame_yaw),
         )
         q = quaternion_multiply(q, fix_tool_to_gripper_rotation_q)
         fixed_pose = copy.deepcopy(pose)
@@ -330,14 +362,18 @@ class SphericalGrasps(object):
         g.pre_grasp_approach.direction.vector.x = self._pre_grasp_direction_x  # NOQA
         g.pre_grasp_approach.direction.vector.y = self._pre_grasp_direction_y  # NOQA
         g.pre_grasp_approach.direction.vector.z = self._pre_grasp_direction_z  # NOQA
-        g.pre_grasp_approach.direction.header.frame_id = self._grasp_postures_frame_id  # NOQA
+        g.pre_grasp_approach.direction.header.frame_id = (
+            self._grasp_postures_frame_id
+        )  # NOQA
         g.pre_grasp_approach.desired_distance = self._grasp_desired_distance  # NOQA
         g.pre_grasp_approach.min_distance = self._grasp_min_distance
         g.post_grasp_retreat = GripperTranslation()
         g.post_grasp_retreat.direction.vector.x = self._post_grasp_direction_x  # NOQA
         g.post_grasp_retreat.direction.vector.y = self._post_grasp_direction_y  # NOQA
         g.post_grasp_retreat.direction.vector.z = self._post_grasp_direction_z  # NOQA
-        g.post_grasp_retreat.direction.header.frame_id = self._grasp_postures_frame_id  # NOQA
+        g.post_grasp_retreat.direction.header.frame_id = (
+            self._grasp_postures_frame_id
+        )  # NOQA
         g.post_grasp_retreat.desired_distance = self._grasp_desired_distance  # NOQA
         g.post_grasp_retreat.min_distance = self._grasp_min_distance
 
@@ -352,13 +388,18 @@ class SphericalGrasps(object):
         """
         tini = rospy.Time.now()
         sphere_poses = self.generate_grasp_poses(object_pose)
-        filtered_poses = filter_poses(sphere_poses, object_pose,
-                                      filter_behind=False, filter_under=True)
+        filtered_poses = filter_poses(
+            sphere_poses, object_pose, filter_behind=False, filter_under=True
+        )
         sorted_poses = sort_by_height(filtered_poses)
         grasps = self.create_grasps_from_poses(sorted_poses)
         tend = rospy.Time.now()
-        rospy.loginfo("Generated " + str(len(grasps)) +
-                      " grasps in " + str((tend - tini).to_sec()))
+        rospy.loginfo(
+            "Generated "
+            + str(len(grasps))
+            + " grasps in "
+            + str((tend - tini).to_sec())
+        )
         # Publishing PoseArrays for debugging pourposes
         self.publish_poses(sphere_poses)
         self.publish_grasps(grasps)
@@ -366,16 +407,18 @@ class SphericalGrasps(object):
         return grasps
 
     def create_placings_from_object_pose(self, posestamped):
-        """ Create a list of PlaceLocation of the object rotated every 15deg"""
+        """Create a list of PlaceLocation of the object rotated every 15deg"""
         place_locs = []
         pre_grasp_posture = JointTrajectory()
         # Actually ignored....
         pre_grasp_posture.header.frame_id = self._grasp_pose_frame_id
         pre_grasp_posture.joint_names = [
-            name for name in self._gripper_joint_names.split()]
+            name for name in self._gripper_joint_names.split()
+        ]
         jtpoint = JointTrajectoryPoint()
         jtpoint.positions = [
-            float(pos) for pos in self._gripper_pre_grasp_positions.split()]
+            float(pos) for pos in self._gripper_pre_grasp_positions.split()
+        ]
         jtpoint.time_from_start = rospy.Duration(self._time_pre_grasp_posture)
         pre_grasp_posture.points.append(jtpoint)
         # Generate all the orientations every step_degrees_yaw deg
@@ -384,22 +427,25 @@ class SphericalGrasps(object):
             pl.place_pose = posestamped
             newquat = quaternion_from_euler(0.0, 0.0, yaw_angle)
             pl.place_pose.pose.orientation = Quaternion(
-                newquat[0], newquat[1], newquat[2], newquat[3])
+                newquat[0], newquat[1], newquat[2], newquat[3]
+            )
             # TODO: the frame is ignored, this will always be the frame of the gripper
             # so arm_tool_link
             pl.pre_place_approach = self.createGripperTranslation(
-                Vector3(1.0, 0.0, 0.0))
+                Vector3(1.0, 0.0, 0.0)
+            )
             pl.post_place_retreat = self.createGripperTranslation(
-                Vector3(-1.0, 0.0, 0.0))
+                Vector3(-1.0, 0.0, 0.0)
+            )
 
             pl.post_place_posture = pre_grasp_posture
             place_locs.append(pl)
 
         return place_locs
 
-    def createGripperTranslation(self, direction_vector,
-                                 desired_distance=0.15,
-                                 min_distance=0.01):
+    def createGripperTranslation(
+        self, direction_vector, desired_distance=0.15, min_distance=0.01
+    ):
         """Returns a GripperTranslation message with the
          direction_vector and desired_distance and min_distance in it.
         Intended to be used to fill the pre_grasp_approach
@@ -414,14 +460,15 @@ class SphericalGrasps(object):
         g_trans.min_distance = min_distance
         return g_trans
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     rospy.init_node("spherical_grasps_server")
     sg = SphericalGrasps()
     # rospy.spin()
 
     # For debugging pourposes
     ps = PoseStamped()
-    ps.header.frame_id = 'base_footprint'
+    ps.header.frame_id = "base_footprint"
     ps.pose.position.x = 1.0
     ps.pose.position.y = 0.0
     ps.pose.position.z = 1.0
