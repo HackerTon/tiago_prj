@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <arg name="rviz" default="false" />
-    <arg name="markerSize" default="0.05" />
+    <arg name="rviz" default="true" />
+    <arg name="markerSize" default="0.045" />
     <arg name="markerBigSize" default="0.70" />
 
     <!-- marker detector -->

@@ -168,6 +168,9 @@ class PickAndPlaceServer(object):
         )
         self.place_as.start()
 
+        self.prev_table = None
+        self.prev_part = None
+
     def pick_cb(self, goal):
         """
         :type goal: PickUpPoseGoal
@@ -226,6 +229,13 @@ class PickAndPlaceServer(object):
 
         rospy.loginfo("Object pose: \n %s", object_pose.pose)
 
+        # save previous part
+        self.prev_part = {
+            "name": "part",
+            "pose": object_pose,
+            "dimension": (self.object_depth, self.object_width, self.object_height),
+        }
+
         # Add object description in scene
         self.scene.add_box(
             "part",
@@ -244,6 +254,12 @@ class PickAndPlaceServer(object):
         # remove few milimeters to prevent contact between the object and the table
         table_height -= 0.008
 
+        # save prev table
+        self.prev_table = {
+            "name": "table",
+            "pose": table_pose,
+            "dimension": (table_depth, table_width, table_height),
+        }
         self.scene.add_box(
             "table", table_pose, (table_depth, table_width, table_height)
         )
@@ -272,13 +288,38 @@ class PickAndPlaceServer(object):
         rospy.loginfo("Pick result: " + str(moveit_error_dict[result.error_code.val]))
 
         # clear octomap to allow clear
+        rospy.loginfo("Removing any previous 'part' object")
+        self.scene.remove_world_object("part")
+        self.scene.remove_world_object("table")
+        rospy.loginfo("Clearing octomap")
         self.clear_octomap_srv.call(EmptyRequest())
+        rospy.sleep(2.0)  # Removing is fast
 
         return result.error_code.val
+
+    def add_object(self, name, pose, dimension):
+        self.scene.add_box(name, pose, dimension)
 
     def place_object(self, object_pose):
         rospy.loginfo("Clearing octomap")
         self.clear_octomap_srv.call(EmptyRequest())
+
+        # add objects into scene
+        # self.scene.add_box(
+        #     self.prev_part["name"],
+        #     self.prev_part["pose"],
+        #     self.prev_part["dimension"],
+        # )
+        self.scene.add_box(
+            self.prev_table["name"],
+            self.prev_table["pose"],
+            self.prev_table["dimension"],
+        )
+
+        # # We need to wait for the object part to appear
+        self.wait_for_planning_scene_object()
+        self.wait_for_planning_scene_object("table")
+
         possible_placings = self.sg.create_placings_from_object_pose(object_pose)
         # Try only with arm
         rospy.loginfo("Trying to place using only arm")

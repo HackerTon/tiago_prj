@@ -141,7 +141,7 @@ class Driver:
             ps.pose.position = pose.position
             ps.pose.orientation = pose.orientation
             ps.header.stamp = self.tfbuffer.get_latest_common_time(
-                "map", "base_footprint"
+                "odom", "base_footprint"
             )
             ps.header.frame_id = "base_footprint"
 
@@ -150,7 +150,7 @@ class Driver:
             while not transform_ok and not rospy.is_shutdown():
                 try:
                     transform = self.tfbuffer.lookup_transform(
-                        "map", "base_footprint", rospy.Time(0)
+                        "odom", "base_footprint", rospy.Time(0)
                     )
                     ps = do_transform_pose(ps, transform)
                     transform_ok = True
@@ -158,7 +158,7 @@ class Driver:
                     rospy.logwarn("Transform error try again")
                     rospy.sleep(0.01)
                     ps.header.stamp = self.tfbuffer.get_latest_common_time(
-                        "map", "base_footprint"
+                        "odom", "base_footprint"
                     )
 
             # rotation around x by 180 degree
@@ -243,23 +243,42 @@ class Driver:
             pick_g.object_pose.pose.position.z -= 0.1 * (1.0 / 2.0)
 
             pick_g.object_pose.header.frame_id = "base_footprint"
-            pick_g.object_pose.pose.orientation.w = aruco_ps.pose.orientation.w
+            pick_g.object_pose.pose.orientation.w = 1.0
 
             self.detected_pub.publish(pick_g.object_pose)
             rospy.loginfo("Picking" + str(pick_g))
             self.pickup_action.send_goal_and_wait(pick_g)
-
             result = self.pickup_action.get_result()
+
+            attemped = 0
+
+            while (
+                attemped < 2 and str(moveit_error_dict[result.error_code]) != "SUCCESS"
+            ):
+                rospy.loginfo("Retry pick " + str(attemped))
+                pick_g.object_pose.pose.position = aruco_ps.pose.position
+                # set picking point to center of cube
+                pick_g.object_pose.pose.position.z -= 0.1 * (1.0 / 2.0)
+
+                pick_g.object_pose.header.frame_id = "base_footprint"
+                pick_g.object_pose.pose.orientation.w = 1.0
+
+                self.detected_pub.publish(pick_g.object_pose)
+                rospy.loginfo("Picking" + str(pick_g))
+                self.pickup_action.send_goal_and_wait(pick_g)
+                result = self.pickup_action.get_result()
+
+                attemped += 1
+
             if str(moveit_error_dict[result.error_code]) != "SUCCESS":
                 rospy.logerr("Failed to pick")
                 return
 
+            # move arm away to avoid collision
             self.lift_torso()
-            self.raise_arm()
+            # self.raise_arm()
 
-            # Place the object back to its position
-            pick_g.object_pose.pose.position.z += 0.05
-            self.place_action.send_goal_and_wait(pick_g)
+            return pick_g
 
     def raise_arm(self):
         # Raise arm
@@ -311,37 +330,59 @@ class Coordinator:
         self.start_service = rospy.Service("/start_demo", Empty, lambda x: self.start())
 
     def start(self):
-        self.driver.pick("pick")
-        # rospy.loginfo("Start moving to area")
-        # rospy.loginfo("Moving to area C")
-        # self.driver.move(poses["C"])
+        rospy.loginfo("Start moving to area")
+        rospy.loginfo("Moving to area C")
+        self.driver.tilt_down()
+        self.driver.move(poses["C"])
 
-        # # wait for aruco aruco markers
-        # try:
-        #     aruco_markers = rospy.wait_for_message(
-        #         "/aruco_many/aruco_markers", MarkerArray, rospy.Duration(10.0)
-        #     )
+        # wait for aruco aruco markers
+        try:
+            aruco_markers = rospy.wait_for_message(
+                "/aruco_many/aruco_markers", MarkerArray, rospy.Duration(10.0)
+            )
 
-        #     rospy.loginfo("Start pickup")
-        #     for marker in aruco_markers.markers:
-        #         if marker.id == 26:
-        #             # get position of marker
-        #             pose = marker.pose.pose
+            rospy.loginfo("Start pickup")
+            for marker in aruco_markers.markers:
+                if marker.id == 26:
+                    # get position of marker
+                    pose = marker.pose.pose
 
-        #             # move the target location closer to the robot
-        #             pose.position.x -= 0.40
-        #             pose.position.z = 0.0
+                    # move the target location closer to the robot
+                    pose.position.x -= 0.40
+                    pose.position.z = 0.0
 
-        #             self.driver.move(pose, transform=True)
+                    self.driver.move(pose, transform=True)
 
-        #             # pick up item
-        #             self.driver.pick("pick")
+                    # pick up item
+                    pick_g = self.driver.pick("pick")
 
-        #             break
+                    rospy.loginfo("Move to location B")
+                    self.driver.tilt_down()
+                    # move to a different location
+                    self.driver.move(poses["A"])
 
-        # except rospy.exceptions.ROSException as e:
-        #     rospy.logwarn(e.message)
-        #     exit()
+                    for marker in aruco_markers.markers:
+                        if marker.id == 26:
+                            # get position of marker
+                            pose = marker.pose.pose
+
+                            # move the target location closer to the robot
+                            pose.position.x -= 0.40
+                            pose.position.z = 0.0
+
+                            self.driver.move(pose, transform=True)
+
+                            # Place the object back to its position
+                            pick_g.object_pose.pose.position.z += 0.05
+                            self.driver.place_action.send_goal_and_wait(pick_g)
+
+                            break
+
+                    break
+
+        except rospy.exceptions.ROSException as e:
+            rospy.logwarn(e.message)
+            exit()
 
 
 if __name__ == "__main__":

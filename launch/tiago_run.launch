@@ -25,7 +25,7 @@
     <arg name="localization" default="amcl" />
     <arg name="map" default="$(env HOME)/.pal/tiago_maps/configurations/2021-05-27_122603" />
 
-    <arg name="rviz" default="true" />
+    <arg name="rviz" default="false" />
     <arg name="gzclient" default="true" />
     <arg name="recording" default="false" />
     <arg name="extra_gazebo_args" default="" />
