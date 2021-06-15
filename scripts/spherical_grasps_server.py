@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2016 PAL Robotics SL. All Rights Reserved
@@ -22,27 +22,41 @@
 #   * Jordi Pages
 
 
-import copy
+import rospy
+import numpy as np
 import math
+from math import radians, pi
+import copy
 from copy import deepcopy
-from math import pi, radians
 
 import actionlib
-import numpy as np
-import rospy
-from dynamic_reconfigure.server import Server
-from geometry_msgs.msg import (Point, Pose, PoseArray, PoseStamped, Quaternion,
-                               Vector3, Vector3Stamped)
-from moveit_msgs.msg import (Grasp, GripperTranslation, PlaceAction, PlaceGoal,
-                             PlaceLocation, PlaceResult)
-from std_msgs.msg import ColorRGBA, Header
-from tf import transformations
-from tf.transformations import (euler_from_quaternion, quaternion_about_axis,
-                                quaternion_from_euler, quaternion_multiply,
-                                unit_vector)
-from tiago_pick_demo.cfg import SphericalGraspConfig
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from visualization_msgs.msg import Marker, MarkerArray
+from std_msgs.msg import ColorRGBA, Header
+from geometry_msgs.msg import (
+    Pose,
+    PoseStamped,
+    PoseArray,
+    Vector3Stamped,
+    Vector3,
+    Quaternion,
+    Point,
+)
+from trajectory_msgs.msg import JointTrajectoryPoint, JointTrajectory
+from moveit_msgs.msg import Grasp, GripperTranslation
+from moveit_msgs.msg import PlaceAction, PlaceGoal, PlaceResult, PlaceLocation
+from visualization_msgs.msg import MarkerArray, Marker
+
+from tf import transformations
+from tf.transformations import (
+    quaternion_from_euler,
+    euler_from_quaternion,
+    quaternion_about_axis,
+    unit_vector,
+    quaternion_multiply,
+)
+
+from dynamic_reconfigure.server import Server
+from tiago_pick_demo.cfg import SphericalGraspConfig
 
 
 def normalize(v):

@@ -168,7 +168,7 @@ class Driver:
             movebasegoal = self.create_movebasegoal(pose)
 
         rospy.loginfo(
-            "Moving to X:{} \n Y:{} \n Z:{} \n QX:{} \n QY:{} \n QZ:{} \n QW:{}".format(
+            "Moving to \n X:{} \n Y:{} \n Z:{} \n QX:{} \n QY:{} \n QZ:{} \n QW:{}".format(
                 movebasegoal.target_pose.pose.position.x,
                 movebasegoal.target_pose.pose.position.y,
                 movebasegoal.target_pose.pose.position.z,
@@ -213,6 +213,7 @@ class Driver:
         # change aruco into posestamped
         ps = PoseStamped()
         ps.pose.position = aruco_pose.pose.pose.position
+        ps.pose.orientation = aruco_pose.pose.pose.orientation
         ps.header.stamp = self.tfbuffer.get_latest_common_time(
             "base_footprint", aruco_pose.header.frame_id
         )
@@ -307,40 +308,40 @@ class Driver:
 class Coordinator:
     def __init__(self):
         self.driver = Driver()
-        self.start_service = rospy.Service('/start_demo', Empty, lambda x: self.start())
-
+        self.start_service = rospy.Service("/start_demo", Empty, lambda x: self.start())
 
     def start(self):
-        rospy.loginfo("Start moving to area")
-        rospy.loginfo("Moving to area C")
-        self.driver.move(poses["C"])
+        self.driver.pick("pick")
+        # rospy.loginfo("Start moving to area")
+        # rospy.loginfo("Moving to area C")
+        # self.driver.move(poses["C"])
 
-        # wait for aruco aruco markers
-        try:
-            aruco_markers = rospy.wait_for_message(
-                "/aruco_many/aruco_markers", MarkerArray, rospy.Duration(10.0)
-            )
+        # # wait for aruco aruco markers
+        # try:
+        #     aruco_markers = rospy.wait_for_message(
+        #         "/aruco_many/aruco_markers", MarkerArray, rospy.Duration(10.0)
+        #     )
 
-            rospy.loginfo("Start pickup")
-            for marker in aruco_markers.markers:
-                if marker.id == 26:
-                    # get position of marker
-                    pose = marker.pose.pose
+        #     rospy.loginfo("Start pickup")
+        #     for marker in aruco_markers.markers:
+        #         if marker.id == 26:
+        #             # get position of marker
+        #             pose = marker.pose.pose
 
-                    # move the target location closer to the robot
-                    pose.position.x -= 0.40
-                    pose.position.z = 0.0
+        #             # move the target location closer to the robot
+        #             pose.position.x -= 0.40
+        #             pose.position.z = 0.0
 
-                    self.driver.move(pose, transform=True)
+        #             self.driver.move(pose, transform=True)
 
-                    # pick up item
-                    self.driver.pick("pick")
+        #             # pick up item
+        #             self.driver.pick("pick")
 
-                    break
+        #             break
 
-        except rospy.exceptions.ROSException as e:
-            rospy.logwarn(e.message)
-            exit()
+        # except rospy.exceptions.ROSException as e:
+        #     rospy.logwarn(e.message)
+        #     exit()
 
 
 if __name__ == "__main__":

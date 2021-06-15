@@ -13,7 +13,7 @@
     <arg name="gzpose" default="-x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0" />
     <arg name="public_sim" default="false" />
     <arg name="tuck_arm" default="true" />
-    <arg name="use_moveit_camera" default="true" />
+    <arg name="use_moveit_camera" default="false" />
     <arg name="use_dynamic_footprint" default="false" />
 
     <env name="LC_NUMERIC" value="C" />

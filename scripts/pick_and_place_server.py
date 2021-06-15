@@ -27,19 +27,39 @@ from random import shuffle
 
 import rospy
 from actionlib import SimpleActionClient, SimpleActionServer
-from geometry_msgs.msg import (Pose, PoseArray, PoseStamped, Quaternion,
-                               Vector3, Vector3Stamped)
-from moveit_commander import (MoveGroupCommander, PlanningSceneInterface,
-                              RobotCommander)
-from moveit_msgs.msg import (Grasp, MoveItErrorCodes, PickupAction, PickupGoal,
-                             PickupResult, PlaceAction, PlaceGoal,
-                             PlaceLocation, PlaceResult)
-from moveit_msgs.srv import (GetPlanningScene, GetPlanningSceneRequest,
-                             GetPlanningSceneResponse)
+from geometry_msgs.msg import (
+    Pose,
+    PoseArray,
+    PoseStamped,
+    Quaternion,
+    Vector3,
+    Vector3Stamped,
+)
+from moveit_commander import MoveGroupCommander, PlanningSceneInterface, RobotCommander
+from moveit_msgs.msg import (
+    Grasp,
+    MoveItErrorCodes,
+    PickupAction,
+    PickupGoal,
+    PickupResult,
+    PlaceAction,
+    PlaceGoal,
+    PlaceLocation,
+    PlaceResult,
+)
+from moveit_msgs.srv import (
+    GetPlanningScene,
+    GetPlanningSceneRequest,
+    GetPlanningSceneResponse,
+)
 from std_srvs.srv import Empty, EmptyRequest
 from tf.transformations import quaternion_from_euler
-from tiago_pick_demo.msg import (PickUpPoseAction, PickUpPoseFeedback,
-                                 PickUpPoseGoal, PickUpPoseResult)
+from tiago_pick_demo.msg import (
+    PickUpPoseAction,
+    PickUpPoseFeedback,
+    PickUpPoseGoal,
+    PickUpPoseResult,
+)
 
 from spherical_grasps_server import SphericalGrasps
 
@@ -148,28 +168,11 @@ class PickAndPlaceServer(object):
         )
         self.place_as.start()
 
-        self.robot = RobotCommander()
-        self.group = MoveGroupCommander("arm_torso")
-
     def pick_cb(self, goal):
         """
         :type goal: PickUpPoseGoal
         """
         error_code = self.grasp_object(goal.object_pose)
-
-        pose = Pose()
-        quarternion = quaternion_from_euler(-0.011, 1.57, 0.037)
-
-        pose.orientation.x = quarternion[0]
-        pose.orientation.y = quarternion[1]
-        pose.orientation.z = quarternion[2]
-        pose.orientation.w = quarternion[3]
-        pose.position.x = 0.4
-        pose.position.y = -0.3
-        pose.position.z = 0.26
-
-        # self.group.plan(pose)
-        # self.group.go()
 
         p_res = PickUpPoseResult()
         p_res.error_code = error_code
@@ -221,7 +224,7 @@ class PickAndPlaceServer(object):
         rospy.sleep(2.0)  # Removing is fast
         rospy.loginfo("Adding new 'part' object")
 
-        rospy.loginfo("Object pose: %s", object_pose.pose)
+        rospy.loginfo("Object pose: \n %s", object_pose.pose)
 
         # Add object description in scene
         self.scene.add_box(
@@ -230,13 +233,13 @@ class PickAndPlaceServer(object):
             (self.object_depth, self.object_width, self.object_height),
         )
 
-        rospy.loginfo("Second%s", object_pose.pose)
+        rospy.loginfo("Second \n %s", object_pose.pose)
         table_pose = copy.deepcopy(object_pose)
 
         # define a virtual table below the object
         table_height = object_pose.pose.position.z - self.object_width / 2
         table_width = 1.8
-        table_depth = 0.5
+        table_depth = 0.8
         table_pose.pose.position.z += -(2 * self.object_width) / 2 - table_height / 2
         # remove few milimeters to prevent contact between the object and the table
         table_height -= 0.008
