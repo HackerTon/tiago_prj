@@ -114,17 +114,8 @@ class Driver:
         rospy.loginfo("Successfully started commander!")
 
     def qua2quanorm(self, orientation):
-        euler = euler_from_quaternion(
-            [
-                orientation.x,
-                orientation.y,
-                orientation.z,
-                orientation.w,
-            ]
-        )
-
         # # rotate the angle towards marker
-        q_old = quaternion_from_euler(0.0, 0.0, euler[2])
+        q_old = [0.0, 0.0, orientation.z, orientation.w]
         q_rotation = quaternion_from_euler(0.0, 0.0, (math.pi / 2) + math.pi)
         q_new = quaternion_multiply(q_rotation, q_old)
 
@@ -237,10 +228,12 @@ class Driver:
 
         pick_g = PickUpPoseGoal()
         if operation == "pick":
-            rospy.loginfo("open")
+            rospy.loginfo("TRYING TO GRASP")
             pick_g.object_pose.pose.position = aruco_ps.pose.position
+
             # set picking point to center of cube
             pick_g.object_pose.pose.position.z -= 0.1 * (1.0 / 2.0)
+            # pick_g.object_pose.pose.position.x -= 0.01
 
             pick_g.object_pose.header.frame_id = "base_footprint"
             pick_g.object_pose.pose.orientation.w = 1.0
@@ -250,33 +243,13 @@ class Driver:
             self.pickup_action.send_goal_and_wait(pick_g)
             result = self.pickup_action.get_result()
 
-            attemped = 0
-
-            while (
-                attemped < 2 and str(moveit_error_dict[result.error_code]) != "SUCCESS"
-            ):
-                rospy.loginfo("Retry pick " + str(attemped))
-                pick_g.object_pose.pose.position = aruco_ps.pose.position
-                # set picking point to center of cube
-                pick_g.object_pose.pose.position.z -= 0.1 * (1.0 / 2.0)
-
-                pick_g.object_pose.header.frame_id = "base_footprint"
-                pick_g.object_pose.pose.orientation.w = 1.0
-
-                self.detected_pub.publish(pick_g.object_pose)
-                rospy.loginfo("Picking" + str(pick_g))
-                self.pickup_action.send_goal_and_wait(pick_g)
-                result = self.pickup_action.get_result()
-
-                attemped += 1
-
             if str(moveit_error_dict[result.error_code]) != "SUCCESS":
                 rospy.logerr("Failed to pick")
                 return
 
             # move arm away to avoid collision
             self.lift_torso()
-            # self.raise_arm()
+            self.raise_arm()
 
             return pick_g
 
@@ -338,8 +311,7 @@ class Coordinator:
         # wait for aruco aruco markers
         try:
             aruco_markers = rospy.wait_for_message(
-                "/aruco_many/aruco_markers", MarkerArray, rospy.Duration(10.0)
-            )
+                "/aruco_many/aruco_markers", MarkerArray, rospy.Duration(10.0))
 
             rospy.loginfo("Start pickup")
             for marker in aruco_markers.markers:
@@ -356,10 +328,13 @@ class Coordinator:
                     # pick up item
                     pick_g = self.driver.pick("pick")
 
-                    rospy.loginfo("Move to location B")
+                    rospy.loginfo("Move to location A")
                     self.driver.tilt_down()
                     # move to a different location
                     self.driver.move(poses["A"])
+
+                    aruco_markers = rospy.wait_for_message(
+                    "/aruco_many/aruco_markers", MarkerArray, rospy.Duration(10.0)            )
 
                     for marker in aruco_markers.markers:
                         if marker.id == 26:

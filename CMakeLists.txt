@@ -119,7 +119,7 @@ generate_dynamic_reconfigure_options(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+# INCLUDE_DIRS include
  LIBRARIES tiago_prj
  CATKIN_DEPENDS cv_bridge image_transport rospy sensor_msgs std_msgs geometry_msgs aruco tf2_ros tf aruco_msgs aruco_ros
 #  DEPENDS system_lib

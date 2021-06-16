@@ -17,7 +17,7 @@ gripper_joint_names: "gripper_left_finger_joint gripper_right_finger_joint"
 # Closed position
 gripper_grasp_positions: "0.015 0.015"
 # Open position
-gripper_pre_grasp_positions: "0.045 0.045"
+gripper_pre_grasp_positions: "0.040 0.040"
 
 # Direction in reference of the grasp_postures_frame_id
 pre_grasp_direction_x: 1.0
@@ -41,10 +41,10 @@ fix_tool_frame_to_grasping_frame_yaw: 0.0
 # Generation of grasps configuration
 # in order to generate more or less poses these
 # parameters can be tuned
-min_degrees_yaw: 0
-max_degrees_yaw: 360
-min_degrees_pitch: 0
-max_degrees_pitch: 360
+min_degrees_yaw: 200
+max_degrees_yaw: 250
+min_degrees_pitch: 270
+max_degrees_pitch: 290
 
 # The steps are the main thing to tune
 step_degrees_pitch: 15

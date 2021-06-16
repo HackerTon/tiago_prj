@@ -305,19 +305,21 @@ class ArucoMarkerPublisher {
             if (marker_msg_->markers.size() > 0)
                 marker_pub_.publish(marker_msg_);
 
-            // Draw detected markers on the image for visualization
-            for (size_t i = 0; i < markers_.size(); ++i) {
-                markers_[i].draw(inImage_, cv::Scalar(0, 0, 255), 2);
-            }
 
-            //draw a 3d cube in each marker if there is 3d info
-            if (camParam_.isValid() && marker_size_ > 0) {
-                for (size_t i = 0; i < markers_.size(); ++i)
-                    aruco::CvDrawingUtils::draw3dAxis(inImage_, markers_[i], camParam_);
-            }
 
             // publish input image with markers drawn on it
             if (publishImage) {
+                // Draw detected markers on the image for visualization
+                for (size_t i = 0; i < markers_.size(); ++i) {
+                    markers_[i].draw(inImage_, cv::Scalar(0, 0, 255), 2);
+                }
+
+                //draw a 3d cube in each marker if there is 3d info
+                if (camParam_.isValid() && marker_size_ > 0) {
+                    for (size_t i = 0; i < markers_.size(); ++i)
+                        aruco::CvDrawingUtils::draw3dAxis(inImage_, markers_[i], camParam_);
+                }
+
                 //show input with augmented information
                 cv_bridge::CvImage out_msg;
                 out_msg.header.stamp = curr_stamp;
