@@ -7,7 +7,7 @@
 ## INSTRUCTION
 ### RUN WORLD AND NAVIGATION
 1. `roslaunch tiago_prj tiago_run.launch`
-2. 
+
 ### RUN WORLD AND NAVIGATION
 1. `roslaunch tiago_prj tiago_run.launch`
 
